@@ -8,9 +8,9 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.transparent, // Rendre l'AppBar transparente pour voir le flou
+      backgroundColor: Colors.black, // Rendre l'AppBar transparente pour voir le flou
       elevation: 0,
-      flexibleSpace: backgroundImage != null
+     /*  flexibleSpace: backgroundImage != null
           ? ClipRect( // ClipRect pour que le BackdropFilter ne s'applique qu'à l'AppBar
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
@@ -19,7 +19,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
             )
-          : null,
+          : null, */
       leadingWidth: 80,
       leading: const Padding(
         padding: EdgeInsets.only(left: 16.0),

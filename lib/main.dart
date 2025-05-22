@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // Initialiser _previousImageUrl avec l'image de départ
-    _previousImageUrl = _bannerImageUrls.isNotEmpty ? mainImageUrl : ""; 
+    _previousImageUrl = _bannerImageUrls.isNotEmpty ? mainImageUrl : "";
     _pageController.addListener(() {
       if (_pageController.page?.round() != _currentPage) {
         setState(() {
@@ -119,11 +119,15 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         // Après un court délai, cacher l'ancienne image et mettre à jour _previousImageUrl
         // pour la prochaine transition.
-        Future.delayed(const Duration(milliseconds: 500), () { // Durée du fondu
+        Future.delayed(const Duration(milliseconds: 500), () {
+          // Durée du fondu
           setState(() {
             _showPreviousImage = false;
-            _previousImageUrl = _bannerImageUrls.isNotEmpty 
-                ? (_currentPage == 0 ? mainImageUrl : _bannerImageUrls[_currentPage % _bannerImageUrls.length]) 
+            _previousImageUrl = _bannerImageUrls.isNotEmpty
+                ? (_currentPage == 0
+                      ? mainImageUrl
+                      : _bannerImageUrls[_currentPage %
+                            _bannerImageUrls.length])
                 : mainImageUrl;
           });
         });
@@ -148,114 +152,109 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBarWidget(backgroundImage: currentImageUrl),
-      body: Stack(
-        children: [
-          // Image précédente pour l'effet de fondu
-          if (_showPreviousImage && _previousImageUrl.isNotEmpty)
-            Positioned.fill(
-              child: Image.network(
-                _previousImageUrl,
-                fit: BoxFit.cover,
-                key: ValueKey<String>("prev_$_previousImageUrl"), // Clé unique
-              ),
-            ),
-          
-          // Image actuelle avec AnimatedOpacity pour l'effet de fondu
-          Positioned.fill(
-            child: AnimatedOpacity(
-              opacity: _showPreviousImage ? 0.0 : 1.0, // Fondu enchaîné
-              duration: const Duration(milliseconds: 500), // Durée du fondu
-              child: Image.network(
-                currentImageUrl, 
-                fit: BoxFit.cover,
-                key: ValueKey<String>(currentImageUrl), // Clé unique pour forcer la reconstruction
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: const Color(0xFF0F0F0F),
-                ), 
-              ),
-            ),
-          ),
-          
-          // BackdropFilter pour le flou (appliqué sur l'image visible)
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 10.0,
-                sigmaY: 10.0,
-              ), // Ajustez pour l'effet désiré
-              child: Container(
-                color: Colors.black.withOpacity(
-                  0.2,
-                ), // Réduire l'opacité ici pour que le dégradé soit plus visible
-              ),
-            ),
-          ),
-          // Ajout du dégradé noir
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.black, // Noir en bas
-                    Colors.transparent, // Transparent en haut
-                  ],
-                  begin: Alignment.bottomCenter, // Commence en bas
-                  end: Alignment.topCenter, // Va vers le haut
-                  stops: const [
-                    0.0, // Début du noir
-                    0.6, // Fin de la transition vers transparent
-                  ], 
-                ),
-              ),
-            ),
-          ),
-
-          // Contenu principal scrollable
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section 1: Carrousel avec fond dynamique et effets
+            Stack(
               children: [
-                // Optionnel: Onglets de catégories si vous voulez les remettre
-                /* CategoryTabsWidget(
-                  selectedCategoryIndex: _selectedCategoryIndex,
-                  categories: _categories,
-                  onCategorySelected: (index) {
-                    setState(() {
-                      _selectedCategoryIndex = index;
-                    });
-                  },
-                ), */
-                ImageCarouselWidget(
-                  pageController: _pageController,
-                  bannerImageUrls: _bannerImageUrls,
-                  currentPage: _currentPage,
+                // Image précédente pour l'effet de fondu
+                if (_showPreviousImage && _previousImageUrl.isNotEmpty)
+                  Positioned.fill(
+                    child: Image.network(
+                      _previousImageUrl,
+                      fit: BoxFit.cover,
+                      key: ValueKey<String>("prev_$_previousImageUrl"),
+                    ),
+                  ),
+                // Image actuelle avec AnimatedOpacity pour l'effet de fondu
+                Positioned.fill(
+                  child: AnimatedOpacity(
+                    opacity: _showPreviousImage ? 0.0 : 1.0,
+                    duration: const Duration(milliseconds: 500),
+                    child: Image.network(
+                      currentImageUrl,
+                      fit: BoxFit.cover,
+                      key: ValueKey<String>(currentImageUrl),
+                      errorBuilder: (context, error, stackTrace) =>
+                          Container(color: const Color(0xFF0F0F0F)),
+                    ),
+                  ),
                 ),
-                const Top10IndicatorWidget(), 
-                // Les boutons d'action peuvent être ici ou plus bas si vous préférez
-                // const ActionButtonsWidget(), 
-                // const SizedBox(height: 16),
-
-                HorizontalImageListWidget(
-                  title: "Programmes originaux QN TV",
-                  imageUrls: _vodImageUrls, // Utilisez une liste d'images appropriée
+                // BackdropFilter pour le flou
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    child: Container(
+                      color: Colors.black.withOpacity(
+                        0.1,
+                      ), // Légère surcouche pour le flou
+                    ),
+                  ),
                 ),
-                HorizontalImageListWidget(
-                  title: "Tendances actuelles",
-                  imageUrls: _bannerImageUrls, // Autre liste pour la démo
+                // Dégradé noir pour la section carrousel
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                     border: Border.all(color: Colors.black, width: 0),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent, // Plus transparent en haut
+                          Colors.black.withOpacity(0.5),
+                          Colors.black, // Plus opaque vers le bas de cette section
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                  ),
                 ),
-                // Vous pouvez ajouter d'autres HorizontalImageListWidget ici
-
-                // Les boutons d'action peuvent aussi être placés à la fin du contenu scrollable
-                const ActionButtonsWidget(),
-                const SizedBox(height: 16), // Marge en bas pour ne pas coller au bord
-                
-                // Espace supplémentaire en bas pour s'assurer que rien n'est masqué
-                // par le dégradé ou la barre de navigation système.
-                const SizedBox(height: 60), 
+                // Contenu de la section carrousel
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ImageCarouselWidget(
+                      pageController: _pageController,
+                      bannerImageUrls: _bannerImageUrls,
+                      currentPage: _currentPage,
+                    ),
+                    // const Top10IndicatorWidget(),
+                    const ActionButtonsWidget(), // Boutons liés au carrousel
+                    const SizedBox(
+                      height: 24,
+                    ), // Espace après les boutons du carrousel
+                  ],
+                ),
               ],
             ),
-          ),
-        ],
+            // Section 2: Listes horizontales avec fond noir
+            Container(
+              color: Colors.black, // Fond noir pour cette section
+              padding: const EdgeInsets.only(
+                top: 16.0,
+              ), // Espace au-dessus des listes
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  HorizontalImageListWidget(
+                    title: "Programmes originaux QN TV",
+                    imageUrls: _vodImageUrls,
+                  ),
+                  HorizontalImageListWidget(
+                    title: "Tendances actuelles",
+                    imageUrls: _bannerImageUrls,
+                  ),
+                  // Vous pouvez ajouter d'autres HorizontalImageListWidget ici
+                  const SizedBox(
+                    height: 60,
+                  ), // Espace en bas de la zone scrollable
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
